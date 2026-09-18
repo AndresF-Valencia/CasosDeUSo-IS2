@@ -10,11 +10,17 @@ import java.util.List;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
-    // Obtiene el libro de acuerdo si coincide con alguno de los tres parametros
-    //Solo es la consulta SQL
+
+    // Búsqueda genérica (título, autor o ISBN) - usada como base, puede servir para HU2
     @Query("SELECT b FROM Book b WHERE " +
-           "LOWER(b.title) LIKE LOWER(CONCAT('%', :term, '%')) OR " +
-           "LOWER(b.author) LIKE LOWER(CONCAT('%', :term, '%')) OR " +
-           "LOWER(b.isbn) LIKE LOWER(CONCAT('%', :term, '%'))")
+            "LOWER(b.title) LIKE LOWER(CONCAT('%', :term, '%')) OR " +
+            "LOWER(b.author) LIKE LOWER(CONCAT('%', :term, '%')) OR " +
+            "LOWER(b.isbn) LIKE LOWER(CONCAT('%', :term, '%'))")
     List<Book> search(@Param("term") String term);
+
+    // Búsqueda básica para HU1: solo título o autor
+    @Query("SELECT b FROM Book b WHERE " +
+            "LOWER(b.title) LIKE LOWER(CONCAT('%', :term, '%')) OR " +
+            "LOWER(b.author) LIKE LOWER(CONCAT('%', :term, '%'))")
+    List<Book> searchByTitleOrAuthor(@Param("term") String term);
 }
