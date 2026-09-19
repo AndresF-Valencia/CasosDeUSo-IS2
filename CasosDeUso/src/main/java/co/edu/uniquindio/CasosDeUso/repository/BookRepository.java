@@ -23,4 +23,14 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "LOWER(b.title) LIKE LOWER(CONCAT('%', :term, '%')) OR " +
             "LOWER(b.author) LIKE LOWER(CONCAT('%', :term, '%'))")
     List<Book> searchByTitleOrAuthor(@Param("term") String term);
+
+    // HU2: búsqueda combinada por título, autor e ISBN (cualquier combinación, AND lógico)
+    // Cada parámetro es opcional: si viene null, ese filtro no se aplica.
+    @Query("SELECT b FROM Book b WHERE " +
+            "(:title IS NULL OR LOWER(b.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
+            "(:author IS NULL OR LOWER(b.author) LIKE LOWER(CONCAT('%', :author, '%'))) AND " +
+            "(:isbn IS NULL OR LOWER(b.isbn) = LOWER(:isbn))")
+    List<Book> searchByTitleAuthorIsbn(@Param("title") String title,
+                                       @Param("author") String author,
+                                       @Param("isbn") String isbn);
 }
