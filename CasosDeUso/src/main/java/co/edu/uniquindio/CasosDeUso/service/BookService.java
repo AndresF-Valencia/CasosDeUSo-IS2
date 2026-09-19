@@ -24,4 +24,26 @@ public class BookService {
         }
         return bookRepository.searchByTitleOrAuthor(term.trim());
     }
+
+    // HU2: búsqueda combinada por título, autor e ISBN
+    public List<Book> searchBooksAdvanced(String title, String author, String isbn) {
+        String normalizedTitle = normalize(title);
+        String normalizedAuthor = normalize(author);
+        String normalizedIsbn = normalize(isbn);
+
+        if (normalizedTitle == null && normalizedAuthor == null && normalizedIsbn == null) {
+            throw new IllegalArgumentException(
+                    "Debe ingresar al menos un criterio de búsqueda: título, autor o ISBN.");
+        }
+
+        return bookRepository.searchByTitleAuthorIsbn(normalizedTitle, normalizedAuthor, normalizedIsbn);
+    }
+
+    // Convierte cadenas vacías o en blanco a null para que el filtro no se aplique
+    private String normalize(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim();
+    }
 }
