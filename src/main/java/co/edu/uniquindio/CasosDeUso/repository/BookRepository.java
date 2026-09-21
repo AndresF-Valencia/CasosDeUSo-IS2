@@ -26,10 +26,13 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     // HU2: búsqueda combinada por título, autor e ISBN (cualquier combinación, AND lógico)
     // Cada parámetro es opcional: si viene null, ese filtro no se aplica.
+    // Nota: se castea cada parámetro a "string" porque PostgreSQL no puede inferir
+    // el tipo de un parámetro que solo se compara con IS NULL (error: "could not
+    // determine data type of parameter"). El CAST le da el tipo explícitamente.
     @Query("SELECT b FROM Book b WHERE " +
-            "(:title IS NULL OR LOWER(b.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
-            "(:author IS NULL OR LOWER(b.author) LIKE LOWER(CONCAT('%', :author, '%'))) AND " +
-            "(:isbn IS NULL OR LOWER(b.isbn) = LOWER(:isbn))")
+            "(CAST(:title AS string) IS NULL OR LOWER(b.title) LIKE LOWER(CONCAT('%', CAST(:title AS string), '%'))) AND " +
+            "(CAST(:author AS string) IS NULL OR LOWER(b.author) LIKE LOWER(CONCAT('%', CAST(:author AS string), '%'))) AND " +
+            "(CAST(:isbn AS string) IS NULL OR LOWER(b.isbn) = LOWER(CAST(:isbn AS string)))")
     List<Book> searchByTitleAuthorIsbn(@Param("title") String title,
                                        @Param("author") String author,
                                        @Param("isbn") String isbn);
